@@ -12,7 +12,7 @@ python 3
 
 
 ## Usage
-./ai_parser -f filename
+./ai_processor -f filename
 
 ## Support
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
