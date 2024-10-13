@@ -66,13 +66,16 @@ def process_file(file_path: str):
 
         print(f"Looking at line: {line[:20]}")  # Debugging line
 
-        # Check for system_instruction and extract it
-        if '"system_instruction":' in line:
+        # Detect and extract system_instruction without expecting quotes or colons
+        if line.startswith('system_instruction='):
             print(f"Found system_instruction line: {line[:20]}")  # Debugging line
-            start_idx = line.find('"', line.find('"system_instruction":') + len('"system_instruction": ')) + 1
-            end_idx = line.rfind('"')
-            system_instruction = clean_text(line[start_idx:end_idx])
+            start_idx = line.find('=') + 1  # Find the start of the instruction after '='
+            system_instruction = clean_text(line[start_idx:].strip())  # Capture everything after '=' and clean it
+
+            # Remove the last two characters (the extra ,)
+            system_instruction = system_instruction[:-1]
             print(f"Extracted system_instruction: {system_instruction[:20]}")  # Debugging line
+
         
         # Detect user message and mark the next line for parts extraction
         elif '"role": "user"' in line:
@@ -126,7 +129,7 @@ def format_output(system_instruction: str, user_list: list, model_list: list, mo
     output_lines = []
 
     # Add the system instruction in both modes
-    output_lines.append(f'Instructions: "{clean_text(system_instruction)}"')
+    output_lines.append(f'Instructions: {clean_text(system_instruction)}')
 
     # Mode 'prose': Only include model messages with no header
     if mode == 'prose':
