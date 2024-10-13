@@ -42,14 +42,19 @@ def process_file(file_path: str):
     user_list = []
     model_list = []
 
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+    except FileNotFoundError:
+        print(f"Error: The file at {file_path} was not found.")
 
     in_user_message = False
     in_model_message = False
 
     for i, line in enumerate(lines):
         line = line.strip()
+
+        print(f"Looking at line: {line[:20]}")  # Debugging line
 
         # Check for system_instruction and extract it
         if '"system_instruction":' in line:
