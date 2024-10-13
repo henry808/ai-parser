@@ -33,6 +33,15 @@ def create_parser() -> argparse.ArgumentParser:
         help='Path to the output file. Required.'
     )
 
+    # Mode Argument: choose between 'prose' and 'exchange'
+    parser.add_argument(
+        '-m', '--mode',
+        type=str,
+        choices=['prose', 'exchange'],
+        default='exchange',  # Default mode is 'exchange'
+        help='Mode of output. "prose" outputs only model responses, "exchange" alternates between user and model. Default is "exchange".'
+    )
+
     # Version Argument
     parser.add_argument(
         '--version',

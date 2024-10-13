@@ -9,6 +9,7 @@
 # ./ai_processor.py -i test_input.txt -o test_output.txt
 
 # ai_processor.py
+import re
 
 def clean_text(text: str) -> str:
     """
@@ -25,6 +26,15 @@ def clean_text(text: str) -> str:
     cleaned_text = text.replace('\\"', '"')
     # Replace escaped newlines with actual newlines
     cleaned_text = cleaned_text.replace('\\n', '\n')
+
+    # Use a regex to reduce multiple spaces between words (not touching newlines or tabs)
+    cleaned_text = re.sub(r'(?<=\S) {2,}(?=\S)', ' ', cleaned_text)
+
+    # Trim leading and trailing spaces for each line
+    cleaned_text = '\n'.join([line.strip() for line in cleaned_text.splitlines()])
+
+    # Ensure no more than two consecutive newlines (reduce multiple newlines to double newlines)
+    cleaned_text = re.sub(r'\n{3,}', '\n\n', cleaned_text)
 
     return cleaned_text
 
@@ -100,7 +110,7 @@ def process_file(file_path: str):
 
     return system_instruction, user_list, model_list
 
-def format_output(system_instruction: str, user_list: list, model_list: list) -> str:
+def format_output(system_instruction: str, user_list: list, model_list: list, mode: str) -> str:
     """
     Formats the extracted information into the desired output format.
     
@@ -108,20 +118,27 @@ def format_output(system_instruction: str, user_list: list, model_list: list) ->
         system_instruction (str): The system instruction.
         user_list (list): List of user messages.
         model_list (list): List of model messages.
+        mode (str): The selected mode for formatting ('prose' or 'exchange').
 
     Returns:
         str: The formatted output.
     """
     output_lines = []
-    
-    # Add the system instruction
+
+    # Add the system instruction in both modes
     output_lines.append(f'Instructions: "{clean_text(system_instruction)}"')
 
-    # Add the user and model messages
-    for i in range(len(user_list)):
-        output_lines.append(f'User: "{clean_text(user_list[i])}"')
-        if i < len(model_list):
-            output_lines.append(clean_text(model_list[i]))
+    # Mode 'prose': Only include model messages with no header
+    if mode == 'prose':
+        for model_message in model_list:
+            output_lines.append(clean_text(model_message))
+    
+    # Mode 'exchange': Alternate between user and model with headers
+    elif mode == 'exchange':
+        for i in range(len(user_list)):
+            output_lines.append(f'User: "{clean_text(user_list[i])}"')
+            if i < len(model_list):
+                output_lines.append(f'Model: {clean_text(model_list[i])}')
 
     return '\n\n'.join(output_lines)
 
@@ -129,8 +146,8 @@ def main(args):
     # Extract system_instruction, user messages, and model messages
     system_instruction, user_list, model_list = process_file(args.input)
 
-    # Format the output
-    final_output = format_output(system_instruction, user_list, model_list)
+    # Format the output based on the selected mode
+    final_output = format_output(system_instruction, user_list, model_list, args.mode)
 
     # Write the output to the output file
     with open(args.output, 'w') as outfile:
