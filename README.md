@@ -4,12 +4,21 @@
 aidstudio-parser
 
 ## Description
-This is a python util for parsing a file from ai studio. It returns a file that can be fed back into ai studio to continue where left off.
-> Instructions should be copied to system instructions. Instructions will be at the start of the output file.
+This is a python util for parsing a file from ai studio. It returns a file that can be attached to a new session in ai studio to continue where left off.
+
+This can be used to continue an AI writing session or RP session.
 
 ## Prerequisites
 python 3
 
+
+## Instructions
+1. Use the "get code" button in the upper right of AI studio to clipboard the code for the session.
+2. Paste it into a notebook file or other text file.
+3. Run this utility on it to produce an output file
+4. Attache the output file to a new ai Studio Session
+5. Cut and past instructions from the beginning of the output into the new AI studio session
+5. Continue the session.
 
 ## Usage
 
