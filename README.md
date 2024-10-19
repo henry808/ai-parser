@@ -12,7 +12,40 @@ python 3
 
 
 ## Usage
-./ai_processor -f filename
+
+```bash
+# will generate an exchange between "user" and "model"
+./ai_processor.py -i input.txt -o output.txt 
+
+# will generate prose using only model
+./ai_processor.py -i input.txt -o output.txt -m prose
+```
+
+## Help file
+
+```bash
+./ai_processor.py -h
+usage: ai_processor.py [-h] -i INPUT -o OUTPUT [-m {prose,exchange}] [--version]
+
+A utility for processing input files and generating output files.
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Path to the input file. Required.
+  -o OUTPUT, --output OUTPUT
+                        Path to the output file. Required.
+  -m {prose,exchange}, --mode {prose,exchange}
+                        Mode of output. "prose" outputs only model responses, "exchange" alternates between user and
+                        model. Default is "exchange".
+  --version             Show the application version and exit.
+```
+
+## Develop and Install
+
+### Instructions for compiling on Windows
+
+
 
 ## Support
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
