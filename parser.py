@@ -42,6 +42,13 @@ def create_parser() -> argparse.ArgumentParser:
         help='Mode of output. "prose" outputs only model responses, "exchange" alternates between user and model. Default is "exchange".'
     )
 
+    # Verbose Mode Argument: turns on debug mode if specified
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Enable verbose (debug) mode.'
+    )
+
     # Version Argument
     parser.add_argument(
         '--version',

@@ -38,12 +38,13 @@ def clean_text(text: str) -> str:
 
     return cleaned_text
 
-def process_file(file_path: str):
+def process_file(file_path: str, verbose: bool = False):
     """
     Processes the input file to extract system_instruction, user messages, and model messages.
     
     Args:
         file_path (str): The path to the input file.
+        verbose (bool): If True, prints debug statements.
 
     Returns:
         tuple: A tuple containing the system_instruction (str), user_list (list), and model_list (list).
@@ -57,6 +58,7 @@ def process_file(file_path: str):
             lines = file.readlines()
     except FileNotFoundError:
         print(f"Error: The file at {file_path} was not found.")
+        return system_instruction, user_list, model_list
 
     in_user_message = False
     in_model_message = False
@@ -64,54 +66,63 @@ def process_file(file_path: str):
     for i, line in enumerate(lines):
         line = line.strip()
 
-        print(f"Looking at line: {line[:20]}")  # Debugging line
+        if verbose:
+            print(f"Looking at line: {line[:20]}")  # Debugging line
 
         # Detect and extract system_instruction without expecting quotes or colons
         if line.startswith('system_instruction='):
-            print(f"Found system_instruction line: {line[:20]}")  # Debugging line
+            if verbose:
+                print(f"Found system_instruction line: {line[:20]}")  # Debugging line
             start_idx = line.find('=') + 1  # Find the start of the instruction after '='
             system_instruction = clean_text(line[start_idx:].strip())  # Capture everything after '=' and clean it
 
             # Remove the last two characters (the extra ,)
             system_instruction = system_instruction[:-1]
-            print(f"Extracted system_instruction: {system_instruction[:20]}")  # Debugging line
+            if verbose:
+                print(f"Extracted system_instruction: {system_instruction[:20]}")  # Debugging line
 
-        
         # Detect user message and mark the next line for parts extraction
         elif '"role": "user"' in line:
             in_user_message = True
-            print(f"Found user role: {line[:20]}")  # Debugging line
+            if verbose:
+                print(f"Found user role: {line[:20]}")  # Debugging line
         
         # Detect model message and mark the next line for parts extraction
         elif '"role": "model"' in line:
             in_model_message = True
-            print(f"Found model role: {line[:20]}")  # Debugging line
+            if verbose:
+                print(f"Found model role: {line[:20]}")  # Debugging line
 
         # Extract user message after "parts"
         elif in_user_message and '"parts": [' in line:
             # Move to the next line to get the actual message
             message_line = lines[i+1].strip()
-            print(f"Found user parts line: {message_line[:20]}")  # Debugging line
+            if verbose:
+                print(f"Found user parts line: {message_line[:20]}")  # Debugging line
             start_idx = message_line.find('"') + 1
             end_idx = message_line.rfind('"')
             user_message = clean_text(message_line[start_idx:end_idx])
             user_list.append(user_message)
-            print(f"Extracted user message: {user_message[:20]}")  # Debugging line
+            if verbose:
+                print(f"Extracted user message: {user_message[:20]}")  # Debugging line
             in_user_message = False  # Reset the flag after extraction
 
         # Extract model message after "parts"
         elif in_model_message and '"parts": [' in line:
             # Move to the next line to get the actual message
             message_line = lines[i+1].strip()
-            print(f"Found model parts line: {message_line[:20]}")  # Debugging line
+            if verbose:
+                print(f"Found model parts line: {message_line[:20]}")  # Debugging line
             start_idx = message_line.find('"') + 1
             end_idx = message_line.rfind('"')
             model_message = clean_text(message_line[start_idx:end_idx])
             model_list.append(model_message)
-            print(f"Extracted model message: {model_message[:20]}")  # Debugging line
+            if verbose:
+                print(f"Extracted model message: {model_message[:20]}")  # Debugging line
             in_model_message = False  # Reset the flag after extraction
 
     return system_instruction, user_list, model_list
+
 
 def format_output(system_instruction: str, user_list: list, model_list: list, mode: str) -> str:
     """
@@ -147,7 +158,7 @@ def format_output(system_instruction: str, user_list: list, model_list: list, mo
 
 def main(args):
     # Extract system_instruction, user messages, and model messages
-    system_instruction, user_list, model_list = process_file(args.input)
+    system_instruction, user_list, model_list = process_file(args.input, args.verbose)
 
     # Format the output based on the selected mode
     final_output = format_output(system_instruction, user_list, model_list, args.mode)
