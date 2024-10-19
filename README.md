@@ -24,8 +24,8 @@ python 3
 ## Help file
 
 ```bash
-./ai_processor.py -h
-usage: ai_processor.py [-h] -i INPUT -o OUTPUT [-m {prose,exchange}] [--version]
+$ ./ai_processor.py -h
+usage: ai_processor.py [-h] -i INPUT -o OUTPUT [-m {prose,exchange}] [-v] [--version]
 
 A utility for processing input files and generating output files.
 
@@ -38,6 +38,7 @@ options:
   -m {prose,exchange}, --mode {prose,exchange}
                         Mode of output. "prose" outputs only model responses, "exchange" alternates between user and
                         model. Default is "exchange".
+  -v, --verbose         Enable verbose (debug) mode.
   --version             Show the application version and exit.
 ```
 
